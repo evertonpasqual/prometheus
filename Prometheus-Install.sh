@@ -1,21 +1,10 @@
 #!/bin/bash
-PROMETHEUS_VERSION="2.46.0"
+PROMETHEUS_VERSION="3.5.0"
 wget https://github.com/prometheus/prometheus/releases/download/v${PROMETHEUS_VERSION}/prometheus-${PROMETHEUS_VERSION}.linux-amd64.tar.gz
 tar -xzvf prometheus-${PROMETHEUS_VERSION}.linux-amd64.tar.gz
 cd prometheus-${PROMETHEUS_VERSION}.linux-amd64/
 # if you just want to start prometheus as root
 #./prometheus --config.file=prometheus.yml
-
-# Ou execute os comandos abaixo para ultima versão do promtetheus
-
-PROMETHEUS_VERSION="2.53.0"
-wget https://github.com/prometheus/prometheus/releases/download/v${PROMETHEUS_VERSION}/prometheus-${PROMETHEUS_VERSION}.linux-amd64.tar.gz
-tar -xzvf prometheus-${PROMETHEUS_VERSION}.linux-amd64.tar.gz
-cd prometheus-${PROMETHEUS_VERSION}.linux-amd64/
-
-#wget https://github.com/evertonpasqual/prometheus/releases/download/Prometheus/prometheus-2.53.0.linux-amd64.tar.gz
-#tar -xzvf prometheus-2.53.0.linux-amd64.tar.gz
-#cd prometheus-2.53.0.linux-amd64
 
 # Create user
 useradd --no-create-home --shell /bin/false prometheus
@@ -42,7 +31,7 @@ cp -r console_libraries /etc/prometheus
 
 # Copy Soncini config
 cd /etc/prometheus/
-wget https://raw.githubusercontent.com/gsoncini/monitoring/main/Config/prometheus.yml
+wget https://raw.githubusercontent.com/evertonpasqual/prometheus/cc56a947afb1f8b0c641e6bb20ce8ade10bb29f7/prometheus.yml
 
 chown -R prometheus:prometheus /etc/prometheus/consoles
 chown -R prometheus:prometheus /etc/prometheus/console_libraries
@@ -68,4 +57,3 @@ WantedBy=multi-user.target' > /etc/systemd/system/prometheus.service
 
 systemctl daemon-reload
 systemctl enable prometheus
-systemctl start prometheus
