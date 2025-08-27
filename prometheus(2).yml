@@ -1,0 +1,60 @@
+global:
+  scrape_interval: 15s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+  evaluation_interval: 15s # Evaluate rules every 15 seconds. The default is every 1 minute.
+
+# REGRAS DE ALERTA
+rule_files:
+  - 'alerts/*.yml'
+
+# CONFIGURACAO DO ALERTMANAGER
+alerting:
+ alertmanagers:
+    - static_configs:
+        - targets: ['45.6.116.215:9093'] 
+
+# VictoriaMetrics
+remote_write:
+  - url: "http://45.6.116.215:8428/api/v1/write"
+
+scrape_configs:
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  - job_name: 'ceph'
+    scrape_interval: 30s
+    static_configs:
+          - targets: ['pve01.dominio:9283']
+          - targets: ['pve02.dominio:9283']
+          - targets: ['pve03.dominio:9283']
+          - targets: ['pve04.dominio:9283']
+
+          # TARGETS CLUSTER
+          - targets: ['10.0.50.121:9283', '10.0.50.122:9283', '10.0.50.123:9283', '10.0.50.124:9283']
+            labels:
+                   cluster: nome-do-cluster
+
+  - job_name: 'node'
+    scrape_interval: 15s
+    static_configs:
+          - targets: ['pve01.dominio:9100']
+          - targets: ['pve02.dominio:9100']
+          - targets: ['pve03.dominio:9100']
+          - targets: ['pve04.dominio:9100']
+# Essa parte só é utilizada caso queira pegar informações das VMs
+  - job_name: 'pve'
+    static_configs:
+      - targets:
+        - nome-do-cluster
+
+    metrics_path: /pve
+    params:
+      module: [default]
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: 127.0.0.1:9221  # PVE exporter.
+
